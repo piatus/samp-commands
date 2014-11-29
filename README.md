@@ -1,4 +1,0 @@
-samp-commands
-=============
-
-samp-commands
