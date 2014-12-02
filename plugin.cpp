@@ -131,8 +131,11 @@ cell AMX_NATIVE_CALL n_OnPlayerCommandText( AMX* amx, cell* params )
 			std::string cmdtxt = std::string( cmdtext );
 			idx=cmdtxt.find_first_of( " " );
 
-			if( idx > 1 ) cmdtxt.replace( 0, idx, "" );
-			
+			if( idx >= 1 ) cmdtxt.replace( 0, idx+1, "" );
+			else {
+				cmdtxt.clear();
+				//cmdtxt.insert(0, "");
+			}
 			amx_PushString( it->second->rcAmx, &amx_addr[numstr], NULL, cmdtxt.c_str(), NULL, NULL );
 			numstr++;
 		}
@@ -249,7 +252,8 @@ string f_MakeCmd( std::string str2 ){
 	std::transform( str.begin(), str.end(), str.begin(), ::tolower );
 	str.replace( 0,1,"" );
 	int fristspace=str.find_first_of( " " );
-	if( fristspace > 1 ) str.replace( fristspace, str.length(), "" );
+	if( fristspace >= 1 ) str.replace( fristspace, str.length(), "" );
+	logprintf("MakeCMd[%s]", str.c_str());
 	return str;
 }
  
