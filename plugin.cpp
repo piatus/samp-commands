@@ -253,7 +253,7 @@ string f_MakeCmd( std::string str2 ){
 	str.replace( 0,1,"" );
 	int fristspace=str.find_first_of( " " );
 	if( fristspace >= 1 ) str.replace( fristspace, str.length(), "" );
-	logprintf("MakeCMd[%s]", str.c_str());
+	//logprintf("MakeCMd[%s]", str.c_str());
 	return str;
 }
  
