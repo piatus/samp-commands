@@ -70,15 +70,24 @@ cell AMX_NATIVE_CALL n_OnPlayerCommandText( AMX* amx, cell* params )
 		if( it->second->rcIsFormat )
 		{	
 			
-			std::string cmdtxt = std::string( cmdtext );
+			std::string cmdtxt = string("");
 			std::string tmp;
 
+			std::vector<std::string> vect = string_split(cmdtext, ' ');
+			if(vect.size() > 1) for(auto sit = vect.rbegin()+1; sit != vect.rend(); ++sit) cmdtxt.insert(cmdtxt.size(), " " + *sit);
+
 			char* format = ( char* )it->second->rcFormat.c_str();
-			int itmp=cmdtxt.find_first_of( " " );
-			int j = strlen( format );
-			 
-			if( itmp > 0 ) cmdtxt.replace( 0, itmp, "" );
+			int itmp=cmdtxt.find_first_of(" ");
+			int j = strlen(cmdtxt.c_str())-1; 
 			
+			if( j > 0 )
+				while(j-- > 0) 
+					if(cmdtxt[j] == ' ' && cmdtxt[j+1] == ' ') cmdtxt.erase( j, 1 ); 
+				else 
+					if(cmdtxt[0] == ' ') cmdtxt.erase( 0, 1 ); 
+			
+			j = strlen( format );
+		  
 			while( j )
 			{
 				j--;
@@ -87,21 +96,22 @@ cell AMX_NATIVE_CALL n_OnPlayerCommandText( AMX* amx, cell* params )
 
 				if ( *( format + j ) == 'd' )
 				{
-					itmp = cmdtxt.find_last_of( " " );
+					itmp = cmdtxt.find_first_of(" ");
 					if( itmp >= cmdtxt.length() ) break;
-					tmp = cmdtxt.substr ( itmp, cmdtxt.length() );  
-					cmdtxt.replace ( itmp, cmdtxt.length(), "" );  
+
+					tmp = cmdtxt.substr ( 0, itmp );  
+					cmdtxt.replace ( 0, itmp, "" );  
 
 					amx_Push( it->second->rcAmx, static_cast<cell>( atoi( tmp.c_str() ) ) );
 					numarg++;
 				}
 				else if ( *( format + j ) == 'f' )
 				{
-					itmp = cmdtxt.find_last_of( " " );
+					itmp = cmdtxt.find_first_of( " " );
 					if( itmp >= cmdtxt.length() ) break;
 
-					tmp = cmdtxt.substr ( itmp, cmdtxt.length() );  
-					cmdtxt.replace ( itmp, cmdtxt.length(), "" );  
+					tmp = cmdtxt.substr ( 0, itmp );  
+					cmdtxt.replace ( 0, itmp, "" );  
 					
 					float value=( float )atof( tmp.c_str() );
 					amx_Push( it->second->rcAmx, amx_ftoc( value ) );
@@ -116,9 +126,9 @@ cell AMX_NATIVE_CALL n_OnPlayerCommandText( AMX* amx, cell* params )
 					
 					if( size > itmp ) size = itmp;
 
-					tmp = cmdtxt.substr ( itmp-size, itmp );  
-					cmdtxt.replace ( itmp-size, itmp, "" );  
-					
+					tmp = cmdtxt.substr ( 0, size );  
+					cmdtxt.replace ( 0, size, "" );  
+					 
 					amx_PushString( it->second->rcAmx, &amx_addr[numstr], NULL, tmp.c_str(), NULL, NULL );
 					
 					numstr++;
@@ -238,6 +248,27 @@ int f_GetSizeString( char * const input )
 	return 0;
 
 }
+			 
+std::vector<std::string> string_split(std::string s, const char delimiter)
+{
+    size_t start=0;
+    size_t end=s.find_first_of(delimiter);
+    
+    std::vector<std::string> output;
+    
+    while (end <= std::string::npos)
+    {
+	    output.emplace_back(s.substr(start, end-start));
+
+	    if (end == std::string::npos)
+	    	break;
+
+    	start=end+1;
+    	end = s.find_first_of(delimiter, start);
+    }
+    
+    return output;
+}
 string f_MakeCallback( std::string str2 ){
 	
 	std::string str=str2;
@@ -253,7 +284,6 @@ string f_MakeCmd( std::string str2 ){
 	str.replace( 0,1,"" );
 	int fristspace=str.find_first_of( " " );
 	if( fristspace >= 1 ) str.replace( fristspace, str.length(), "" );
-	//logprintf("MakeCMd[%s]", str.c_str());
 	return str;
 }
  

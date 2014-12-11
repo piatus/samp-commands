@@ -70,6 +70,7 @@ cell amx_addr[128] = {NULL};
 int f_ClearMap(AMX* amx);
 int f_GetSizeString(char * const input);
 int f_SearchCommands(AMX* amx);
+std::vector<std::string> string_split(std::string s, const char delimiter);
 std::string f_MakeCallback(std::string cmd);
 std::string f_MakeCmd(std::string cmd);
  
